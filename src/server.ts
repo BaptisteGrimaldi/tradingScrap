@@ -1,12 +1,13 @@
-const express = require('express');
+import express from 'express';
 const app = express();
 
-const cors = require('cors');
-const mysql = require('mysql2');
-const bodyparser = require('body-parser');
-const path = require('path');
-const { query } = require('express');
-const fs = require('fs');
+import cors from 'cors';
+import mysql from 'mysql2';
+import bodyparser from 'body-parser';
+import path from 'path';
+// Importing 'query' from express is not common, so you can remove this line.
+// import { query } from 'express';
+import fs from 'fs';
 
 var corsOptions = {
   origin: '*',
@@ -22,29 +23,39 @@ app.use(
   })
 );
 
+type EntrepriseData = {
+  entreprise: string[],
+  nombreEntreprise : string;
+}
+
 app.post('/entreprise', (req: any, res: any) => {
+  const data: EntrepriseData = req.body;
+  console.log(data);
+  console.log(data.entreprise.length)
+  console.log(data.nombreEntreprise)
 
-    
-    function requeteBdd(){
+  const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Crapulo2001*',
+    database: 'entreprisebourse',
+  });
 
-        const connection = mysql.createConnection({
-            host: "localhost",
-            user: "root",
-            password: 'Crapulo2001*',
-            database: "entreprisebourse"
-        });
-        let requeteSql = "INSERT INTO entreprisebourse.entreprise (nom) VALUES ('Exemple de nom')"
-    
-        connection.query(
+  const insertQuery = 'INSERT INTO entreprisebourse.entreprise (nom) VALUES (?)';
 
-            requeteSql,
-            function(results) {
+  data.entreprise.forEach(entreprise => {
+    connection.query(insertQuery, [entreprise], (err, result) => {
+      if (err) {
+        console.error('Erreur lors de l\'insertion:', err);
+      }
+    });
+  });
 
-            }
-        )
+  connection.end();
 
-    }
+  res.end();
 });
+
 
 app.listen(3000, () => {
   console.clear();

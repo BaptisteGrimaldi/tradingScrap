@@ -1,7 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 // import puppeteer from 'puppeteer';
-const puppeteer_1 = require("puppeteer");
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const axios_1 = __importDefault(require("axios"));
 async function run() {
     const browser = await puppeteer_1.default.launch({
         executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
@@ -67,22 +71,23 @@ async function run() {
     await page.waitForTimeout(1000);
     await page.click('label[for="country_12"]');
     await page.waitForTimeout(1000);
-    let anchorsEntrepriseStart = await page.$$eval('tbody a', (elements) => elements.map((el) => el.textContent).slice(1, -4));
+    // let anchorsEntrepriseStart = await page.$$eval('tbody a', (elements) =>
+    //   elements.map((el) => el.textContent).slice(1, -4)
+    // );
+    let anchorsEntrepriseStart = [];
     while (true) {
         const suivant = await page.$('a[title="Page suivante"]');
         const precedent = await page.$('a[title="Page précédente"]');
         if (suivant) {
             if (precedent) {
-                const anchorsEntreprise = await page.$$eval('tbody a', (elements) => elements.map((el) => el.textContent).slice(1, -5));
+                let anchorsEntreprise = await page.$$eval('tbody a', (elements) => elements.map((el) => el.textContent).slice(1, -5));
                 anchorsEntrepriseStart = anchorsEntrepriseStart.concat(anchorsEntreprise);
-                // await page.waitForTimeout(1000);
                 await suivant.click();
                 await page.waitForNavigation();
             }
             else {
                 const anchorsEntreprise = await page.$$eval('tbody a', (elements) => elements.map((el) => el.textContent).slice(1, -4));
                 anchorsEntrepriseStart = anchorsEntrepriseStart.concat(anchorsEntreprise);
-                // await page.waitForTimeout(1000);
                 await suivant.click();
                 await page.waitForNavigation();
             }
@@ -93,14 +98,38 @@ async function run() {
             break;
         }
     }
-    fetch('http://127.0.0.1:3000/entreprise', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        // body : JSON.stringify(formu)
+    const nombreEntreprise = await page.evaluate(() => {
+        const element = document.getElementById('div_res_val');
+        if (element) {
+            return element.innerHTML;
+        }
+        else {
+            return null;
+        }
     });
-    console.log(anchorsEntrepriseStart);
+    console.log(nombreEntreprise);
+    const entreprise = { entreprise: anchorsEntrepriseStart, nombreEntreprise: nombreEntreprise };
+    async function postData() {
+        const url = 'http://127.0.0.1:3000/entreprise';
+        const data = entreprise;
+        try {
+            const response = await axios_1.default.post(url, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                console.error('Error:', error.message);
+            }
+            else {
+                console.error('Unknown error occurred.');
+            }
+        }
+    }
+    postData();
+    // console.log(anchorsEntrepriseStart);
     // await browser.close();
 }
 run();

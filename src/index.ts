@@ -2,6 +2,7 @@
 import puppeteer, { ElementHandle, Frame } from 'puppeteer';
 import { createObjectCsvWriter } from 'csv-writer';
 import { readFile } from 'fs/promises';
+import axios from 'axios';
 
 async function run() {
   const browser = await puppeteer.launch({
@@ -87,9 +88,11 @@ async function run() {
 
   await page.waitForTimeout(1000);
 
-  let anchorsEntrepriseStart = await page.$$eval('tbody a', (elements) =>
-    elements.map((el) => el.textContent).slice(1, -4)
-  );
+  // let anchorsEntrepriseStart = await page.$$eval('tbody a', (elements) =>
+  //   elements.map((el) => el.textContent).slice(1, -4)
+  // );
+
+  let anchorsEntrepriseStart: any[] = [];
 
   while (true) {
     const suivant = await page.$('a[title="Page suivante"]');
@@ -97,11 +100,10 @@ async function run() {
 
     if (suivant) {
       if (precedent) {
-        const anchorsEntreprise = await page.$$eval('tbody a', (elements) =>
+        let anchorsEntreprise = await page.$$eval('tbody a', (elements) =>
           elements.map((el) => el.textContent).slice(1, -5)
         );
         anchorsEntrepriseStart = anchorsEntrepriseStart.concat(anchorsEntreprise);
-        // await page.waitForTimeout(1000);
         await suivant.click();
         await page.waitForNavigation();
       } else {
@@ -109,7 +111,6 @@ async function run() {
           elements.map((el) => el.textContent).slice(1, -4)
         );
         anchorsEntrepriseStart = anchorsEntrepriseStart.concat(anchorsEntreprise);
-        // await page.waitForTimeout(1000);
         await suivant.click();
         await page.waitForNavigation();
       }
@@ -122,15 +123,39 @@ async function run() {
     }
   }
 
-  fetch('http://127.0.0.1:3000/entreprise', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    // body : JSON.stringify(formu)
+  const nombreEntreprise = await page.evaluate(() => {
+    const element = document.getElementById('div_res_val');
+    if (element) {
+      return element.innerHTML;
+    } else {
+      return null;
+    }
   });
+  
+  console.log(nombreEntreprise);
 
-  console.log(anchorsEntrepriseStart);
+  const entreprise: object = { entreprise: anchorsEntrepriseStart , nombreEntreprise : nombreEntreprise};
+
+  async function postData() {
+    const url = 'http://127.0.0.1:3000/entreprise';
+    const data = entreprise;
+    try {
+      const response = await axios.post(url, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error:', error.message);
+      } else {
+        console.error('Unknown error occurred.');
+      }
+    }
+  }
+  postData();
+
+  // console.log(anchorsEntrepriseStart);
 
   // await browser.close();
 }
