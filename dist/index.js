@@ -10,24 +10,43 @@ async function run() {
         executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
         headless: false,
         defaultViewport: null,
-        args: ['--start-maximized']
+        args: ['--start-maximized'],
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto('https://www.boursier.com/actions/new-york');
-    const boutonAccepter = await page.waitForSelector("#didomi-notice-agree-button", { timeout: 5000 });
+    const boutonAccepter = await page.waitForSelector('#didomi-notice-agree-button', {
+        timeout: 5000,
+    });
     if (boutonAccepter) {
-        await page.click("#didomi-notice-agree-button");
+        await page.click('#didomi-notice-agree-button');
     }
     else {
         throw new Error("L'élément avec l'identifiant #didomi-notice-agree-button n'a pas été trouvé.");
     }
-    const entrepriseA = await page.waitForSelector('a[href="?letter=A"]');
-    if (entrepriseA) {
-        await entrepriseA.click();
-    }
-    setTimeout(() => console.clear(), 5000);
-    // while (true) {
+    //Ya un bug sur la lettre X (sa renvoie vers Y) mais url bonne
+    const tabLettre = ["1", 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'];
+    // for (const lettre of tabLettre) {
+    //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
+    //   if (entrepriseLettre) {
+    //     await entrepriseLettre.click();
+    //     await page.waitForTimeout(1000);
+    //     try {
+    //       const lastPageLink = await page.waitForSelector('a[aria-label="Dernière page"]', { timeout: 2000 });
+    //       if (lastPageLink) {
+    //         await lastPageLink.click();
+    //       }
+    //     } catch (error) {
+    //       console.log("L'élément n'est pas présent, passer à la suite...");
+    //     }
+    //     // Pour tester:
+    //
+    //     // await page.waitForTimeout(1000);
+    //     // await page.evaluate(() => {
+    //     //   window.scrollTo(0, 2000);
+    //     // });
+    //     await page.waitForTimeout(2000);
+    //   }
     // }
     // const entreprise: object = {
     //   entreprise: anchorsEntrepriseStart,
@@ -54,5 +73,6 @@ async function run() {
     // https://www.boursier.com/actions/new-york
     // console.log(anchorsEntrepriseStart);
     // await browser.close();
+    setTimeout(() => console.clear(), 5000);
 }
 run();
