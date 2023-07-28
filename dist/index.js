@@ -10,23 +10,23 @@ async function run() {
         executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
         headless: false,
         defaultViewport: null,
-        args: ['--start-maximized'],
+        args: ['--start-maximized']
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto('https://www.boursier.com/actions/new-york');
-    await page.waitForNavigation();
-    const scrollPosition = 500; // Position de défilement en pixels
-    await page.evaluate((scrollPosition) => {
-        window.scrollTo(0, scrollPosition);
-    }, scrollPosition);
-    await page.evaluate(() => {
-        document.addEventListener('mousemove', (event) => {
-            const { clientX, clientY } = event;
-            console.log(`Coordonnées de la souris : X=${clientX}, Y=${clientY}`);
-        });
-    });
-    let anchorsEntrepriseStart = [];
+    const boutonAccepter = await page.waitForSelector("#didomi-notice-agree-button", { timeout: 5000 });
+    if (boutonAccepter) {
+        await page.click("#didomi-notice-agree-button");
+    }
+    else {
+        throw new Error("L'élément avec l'identifiant #didomi-notice-agree-button n'a pas été trouvé.");
+    }
+    const entrepriseA = await page.waitForSelector('a[href="?letter=A"]');
+    if (entrepriseA) {
+        await entrepriseA.click();
+    }
+    setTimeout(() => console.clear(), 5000);
     // while (true) {
     // }
     // const entreprise: object = {
