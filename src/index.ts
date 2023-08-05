@@ -31,44 +31,38 @@ async function run() {
 
   for (const lettre of tabLettre) {
     const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
-  
+
     if (entrepriseLettre) {
       await entrepriseLettre.click();
-  
+
       await page.waitForTimeout(2000);
-  
+
       let numPage = 2;
       while (true) {
         try {
-          console.log(numPage,lettre);
+          console.log(numPage, lettre);
 
-          const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`,{ timeout: 500 });
+          const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
           if (pageSuivanteInit) {
             pageSuivanteInit.click();
             numPage++;
             await page.waitForTimeout(2000);
           }
-
         } catch {
-          try{
-            const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`,{ timeout: 500 })
-            if(pageSuivante){
+          try {
+            const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
+            if (pageSuivante) {
               pageSuivante.click();
               numPage++;
               await page.waitForTimeout(2000);
             }
-          }
-          catch{
+          } catch {
             break;
           }
         }
       }
     }
   }
-  
-  
-  
-  
 
   // const entreprise: object = {
   //   entreprise: anchorsEntrepriseStart,
