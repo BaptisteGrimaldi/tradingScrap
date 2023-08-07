@@ -4,7 +4,6 @@ import { createObjectCsvWriter } from 'csv-writer';
 import { readFile } from 'fs/promises';
 import axios from 'axios';
 
-
 async function run() {
   const browser = await puppeteer.launch({
     executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
@@ -29,6 +28,33 @@ async function run() {
 
   //Y'a un bug sur la lettre X (sa renvoie vers Y) mais url bonne
   const tabLettre: string[] = ['1', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'];
+
+  type listeEntreprise = {
+    nomEntreprise: string;
+    cours: string;
+  };
+
+  async function recupListePage() {
+    const entrepriseLettre = await page.waitForSelector('tr');
+
+    const test = await page.$$('tr');
+
+    if (test.length > 0) {
+      const firstElement = test[30];
+      const textContent = await firstElement.evaluate(element => element.textContent);
+      console.log(textContent);
+    }
+
+    // if (entrepriseLettre) {
+    //   const textContent = await entrepriseLettre.evaluate(element => element.textContent);
+    //   console.log(textContent);
+    // }
+  }
+
+  await page.waitForTimeout(2000);
+  console.log("lance")
+
+  recupListePage();
 
   // for (const lettre of tabLettre) {
   //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
@@ -94,7 +120,7 @@ async function run() {
   // console.log(anchorsEntrepriseStart);
 
   // await browser.close();
-  setTimeout(() => console.clear(), 5000);
+  // setTimeout(() => console.clear(), 5000);
 }
 
 run();
