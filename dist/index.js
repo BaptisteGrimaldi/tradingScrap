@@ -26,38 +26,36 @@ async function run() {
     }
     //Y'a un bug sur la lettre X (sa renvoie vers Y) mais url bonne
     const tabLettre = ['1', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'];
-    for (const lettre of tabLettre) {
-        const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
-        if (entrepriseLettre) {
-            await entrepriseLettre.click();
-            await page.waitForTimeout(2000);
-            let numPage = 2;
-            while (true) {
-                try {
-                    console.log(numPage, lettre);
-                    const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
-                    if (pageSuivanteInit) {
-                        pageSuivanteInit.click();
-                        numPage++;
-                        await page.waitForTimeout(2000);
-                    }
-                }
-                catch (_a) {
-                    try {
-                        const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
-                        if (pageSuivante) {
-                            pageSuivante.click();
-                            numPage++;
-                            await page.waitForTimeout(2000);
-                        }
-                    }
-                    catch (_b) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
+    // for (const lettre of tabLettre) {
+    //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
+    //   if (entrepriseLettre) {
+    //     await entrepriseLettre.click();
+    //     await page.waitForTimeout(2000);
+    //     let numPage = 2;
+    //     while (true) {
+    //       try {
+    //         console.log(numPage, lettre);
+    //         const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
+    //         if (pageSuivanteInit) {
+    //           pageSuivanteInit.click();
+    //           numPage++;
+    //           await page.waitForTimeout(2000);
+    //         }
+    //       } catch {
+    //         try {
+    //           const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
+    //           if (pageSuivante) {
+    //             pageSuivante.click();
+    //             numPage++;
+    //             await page.waitForTimeout(2000);
+    //           }
+    //         } catch {
+    //           break;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     // const entreprise: object = {
     //   entreprise: anchorsEntrepriseStart,
     //   nombreEntreprise: nombreEntreprise,
