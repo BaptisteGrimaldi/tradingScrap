@@ -35,13 +35,13 @@ async function run() {
   };
 
   async function recupListePage() {
-    const entrepriseLettre = await page.waitForSelector('tr');
+    const entrepriseLettre = await page.waitForSelector('td');
 
-    const test = await page.$$('tr');
+    const test = await page.$$('td');
 
     if (test.length > 0) {
-      const firstElement = test[30];
-      const textContent = await firstElement.evaluate(element => element.textContent);
+      const firstElement = test[100];
+      const textContent = await firstElement.evaluate((element) => element.textContent);
       console.log(textContent);
     }
 
@@ -52,75 +52,104 @@ async function run() {
   }
 
   await page.waitForTimeout(2000);
-  console.log("lance")
+  console.log('lance');
 
-  recupListePage();
+  // boucle ca : de +7 en +7 pour le nom  et +8 en +8 pour le cours
 
-  // for (const lettre of tabLettre) {
-  //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
+  await page.waitForSelector('table.table.nod.table--values.table--no-auto');
 
-  //   if (entrepriseLettre) {
-  //     await entrepriseLettre.click();
+  const tdSelector = 'table.table.nod.table--values.table--no-auto tbody tr td';
 
-  //     await page.waitForTimeout(2000);
+  const tdElements = await page.$$(tdSelector);
 
-  //     let numPage = 2;
-  //     while (true) {
-  //       try {
-  //         console.log(numPage, lettre);
+  if (tdElements.length > 0) {
+    const firstTd = tdElements[14];
+    const tdText = await firstTd.evaluate(element => element.textContent);
+    if(tdText!==null){
+      console.log(tdText)
+    }else{
+      console.log("pas trouvé");
+    }
+  }
 
-  //         const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
-  //         if (pageSuivanteInit) {
-  //           pageSuivanteInit.click();
-  //           numPage++;
-  //           await page.waitForTimeout(2000);
-  //         }
-  //       } catch {
-  //         try {
-  //           const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
-  //           if (pageSuivante) {
-  //             pageSuivante.click();
-  //             numPage++;
-  //             await page.waitForTimeout(2000);
-  //           }
-  //         } catch {
-  //           break;
-  //         }
-  //       }
-  //     }
+  // for (const td of tdElements) {
+  //   // Check if the td element has non-null textContent
+  //   const tdText = await td.evaluate((element) => element.textContent);
+
+  //   if (tdText !== null) {
+  //     console.log(tdText);
+  //   } else {
+  //     console.log('TD element textContent is null.');
   //   }
   // }
 
-  // const entreprise: object = {
-  //   entreprise: anchorsEntrepriseStart,
-  //   nombreEntreprise: nombreEntreprise,
-  // };
+    // recupListePage();
 
-  // async function postData() {
-  //   const url = 'http://127.0.0.1:3000/entreprise';
-  //   const data = entreprise;
-  //   try {
-  //     const response = await axios.post(url, data, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       console.error('Error:', error.message);
-  //     } else {
-  //       console.error('Unknown error occurred.');
-  //     }
-  //   }
-  // }
-  // postData();
+    // for (const lettre of tabLettre) {
+    //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
 
-  // https://www.boursier.com/actions/new-york
+    //   if (entrepriseLettre) {
+    //     await entrepriseLettre.click();
 
-  // console.log(anchorsEntrepriseStart);
+    //     await page.waitForTimeout(2000);
 
-  // await browser.close();
-  // setTimeout(() => console.clear(), 5000);
+    //     let numPage = 2;
+    //     while (true) {
+    //       try {
+    //         console.log(numPage, lettre);
+
+    //         const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
+    //         if (pageSuivanteInit) {
+    //           pageSuivanteInit.click();
+    //           numPage++;
+    //           await page.waitForTimeout(2000);
+    //         }
+    //       } catch {
+    //         try {
+    //           const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
+    //           if (pageSuivante) {
+    //             pageSuivante.click();
+    //             numPage++;
+    //             await page.waitForTimeout(2000);
+    //           }
+    //         } catch {
+    //           break;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
+    // const entreprise: object = {
+    //   entreprise: anchorsEntrepriseStart,
+    //   nombreEntreprise: nombreEntreprise,
+    // };
+
+    // async function postData() {
+    //   const url = 'http://127.0.0.1:3000/entreprise';
+    //   const data = entreprise;
+    //   try {
+    //     const response = await axios.post(url, data, {
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //     });
+    //   } catch (error: unknown) {
+    //     if (error instanceof Error) {
+    //       console.error('Error:', error.message);
+    //     } else {
+    //       console.error('Unknown error occurred.');
+    //     }
+    //   }
+    // }
+    // postData();
+
+    // https://www.boursier.com/actions/new-york
+
+    // console.log(anchorsEntrepriseStart);
+
+    // await browser.close();
+    // setTimeout(() => console.clear(), 5000);
 }
 
 run();

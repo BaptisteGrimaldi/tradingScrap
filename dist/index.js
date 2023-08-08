@@ -27,11 +27,11 @@ async function run() {
     //Y'a un bug sur la lettre X (sa renvoie vers Y) mais url bonne
     const tabLettre = ['1', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'];
     async function recupListePage() {
-        const entrepriseLettre = await page.waitForSelector('tr');
-        const test = await page.$$('tr');
+        const entrepriseLettre = await page.waitForSelector('td');
+        const test = await page.$$('td');
         if (test.length > 0) {
-            const firstElement = test[30];
-            const textContent = await firstElement.evaluate(element => element.textContent);
+            const firstElement = test[100];
+            const textContent = await firstElement.evaluate((element) => element.textContent);
             console.log(textContent);
         }
         // if (entrepriseLettre) {
@@ -40,8 +40,31 @@ async function run() {
         // }
     }
     await page.waitForTimeout(2000);
-    console.log("lance");
-    recupListePage();
+    console.log('lance');
+    // boucle ca : de +7 en +7 pour le nom  et +8 en +8 pour le cours
+    await page.waitForSelector('table.table.nod.table--values.table--no-auto');
+    const tdSelector = 'table.table.nod.table--values.table--no-auto tbody tr td';
+    const tdElements = await page.$$(tdSelector);
+    if (tdElements.length > 0) {
+        const firstTd = tdElements[14];
+        const tdText = await firstTd.evaluate(element => element.textContent);
+        if (tdText !== null) {
+            console.log(tdText);
+        }
+        else {
+            console.log("pas trouvé");
+        }
+    }
+    // for (const td of tdElements) {
+    //   // Check if the td element has non-null textContent
+    //   const tdText = await td.evaluate((element) => element.textContent);
+    //   if (tdText !== null) {
+    //     console.log(tdText);
+    //   } else {
+    //     console.log('TD element textContent is null.');
+    //   }
+    // }
+    // recupListePage();
     // for (const lettre of tabLettre) {
     //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
     //   if (entrepriseLettre) {
