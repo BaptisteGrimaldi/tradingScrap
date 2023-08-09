@@ -35,121 +35,95 @@ async function run() {
   };
 
   async function recupListePage() {
-    const entrepriseLettre = await page.waitForSelector('td');
+    await page.waitForSelector('table.table.nod.table--values.table--no-auto');
 
-    const test = await page.$$('td');
+    const tdSelector = 'table.table.nod.table--values.table--no-auto tbody tr td';
 
-    if (test.length > 0) {
-      const firstElement = test[100];
-      const textContent = await firstElement.evaluate((element) => element.textContent);
-      console.log(textContent);
+    const tdElements = await page.$$(tdSelector);
+
+    if (tdElements.length > 0) {
+      for (let i = 0; i < 280; i += 7) {
+        const firstTd = tdElements[i];
+        const tdText = await firstTd.evaluate((element) => element.textContent);
+        if (tdText !== null) {
+          console.log(tdText);
+        } else {
+          break;
+        }
+      }
     }
-
-    // if (entrepriseLettre) {
-    //   const textContent = await entrepriseLettre.evaluate(element => element.textContent);
-    //   console.log(textContent);
-    // }
   }
 
   await page.waitForTimeout(2000);
   console.log('lance');
 
-  // boucle ca : de +7 en +7 pour le nom  et +8 en +8 pour le cours
+  // recupListePage();
 
-  await page.waitForSelector('table.table.nod.table--values.table--no-auto');
+  for (const lettre of tabLettre) {
+    const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
 
-  const tdSelector = 'table.table.nod.table--values.table--no-auto tbody tr td';
+    if (entrepriseLettre) {
+      await entrepriseLettre.click();
 
-  const tdElements = await page.$$(tdSelector);
+      await page.waitForTimeout(2000);
 
-  if (tdElements.length > 0) {
-    const firstTd = tdElements[14];
-    const tdText = await firstTd.evaluate(element => element.textContent);
-    if(tdText!==null){
-      console.log(tdText)
-    }else{
-      console.log("pas trouvé");
+      let numPage = 2;
+      while (true) {
+        try {
+          recupListePage();
+          const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
+          if (pageSuivanteInit) {
+            pageSuivanteInit.click();
+            numPage++;
+            await page.waitForTimeout(2000);
+          }
+        } catch {
+          try {
+            recupListePage();
+            const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
+            if (pageSuivante) {
+              pageSuivante.click();
+              numPage++;
+              await page.waitForTimeout(2000);
+            }
+          } catch {
+            break;
+          }
+        }
+      }
     }
   }
 
-  // for (const td of tdElements) {
-  //   // Check if the td element has non-null textContent
-  //   const tdText = await td.evaluate((element) => element.textContent);
+  // const entreprise: object = {
+  //   entreprise: anchorsEntrepriseStart,
+  //   nombreEntreprise: nombreEntreprise,
+  // };
 
-  //   if (tdText !== null) {
-  //     console.log(tdText);
-  //   } else {
-  //     console.log('TD element textContent is null.');
+  // async function postData() {
+  //   const url = 'http://127.0.0.1:3000/entreprise';
+  //   const data = entreprise;
+  //   try {
+  //     const response = await axios.post(url, data, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+  //   } catch (error: unknown) {
+  //     if (error instanceof Error) {
+  //       console.error('Error:', error.message);
+  //     } else {
+  //       console.error('Unknown error occurred.');
+  //     }
   //   }
   // }
+  // postData();
 
-    // recupListePage();
+  // https://www.boursier.com/actions/new-york
 
-    // for (const lettre of tabLettre) {
-    //   const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
+  // console.log(anchorsEntrepriseStart);
 
-    //   if (entrepriseLettre) {
-    //     await entrepriseLettre.click();
-
-    //     await page.waitForTimeout(2000);
-
-    //     let numPage = 2;
-    //     while (true) {
-    //       try {
-    //         console.log(numPage, lettre);
-
-    //         const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
-    //         if (pageSuivanteInit) {
-    //           pageSuivanteInit.click();
-    //           numPage++;
-    //           await page.waitForTimeout(2000);
-    //         }
-    //       } catch {
-    //         try {
-    //           const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
-    //           if (pageSuivante) {
-    //             pageSuivante.click();
-    //             numPage++;
-    //             await page.waitForTimeout(2000);
-    //           }
-    //         } catch {
-    //           break;
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
-    // const entreprise: object = {
-    //   entreprise: anchorsEntrepriseStart,
-    //   nombreEntreprise: nombreEntreprise,
-    // };
-
-    // async function postData() {
-    //   const url = 'http://127.0.0.1:3000/entreprise';
-    //   const data = entreprise;
-    //   try {
-    //     const response = await axios.post(url, data, {
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //     });
-    //   } catch (error: unknown) {
-    //     if (error instanceof Error) {
-    //       console.error('Error:', error.message);
-    //     } else {
-    //       console.error('Unknown error occurred.');
-    //     }
-    //   }
-    // }
-    // postData();
-
-    // https://www.boursier.com/actions/new-york
-
-    // console.log(anchorsEntrepriseStart);
-
-    // await browser.close();
-    // setTimeout(() => console.clear(), 5000);
+  // await browser.close();
+  // setTimeout(() => console.clear(), 5000);
 }
 
 run();
