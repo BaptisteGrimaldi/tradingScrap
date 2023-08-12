@@ -32,12 +32,16 @@ async function run() {
         const tdElements = await page.$$(tdSelector);
         if (tdElements.length > 0) {
             for (let i = 0; i < 280; i += 7) {
-                const firstTd = tdElements[i];
-                const tdText = await firstTd.evaluate((element) => element.textContent);
-                if (tdText !== null) {
-                    console.log(tdText);
+                const indexTdNomDeLentreprise = tdElements[i];
+                const indexTdCourDeEntreprise = tdElements[i + 1];
+                try {
+                    const nomDeLentreprise = await indexTdNomDeLentreprise.evaluate((element) => element.textContent);
+                    const courDeEntreprise = await indexTdCourDeEntreprise.evaluate((element) => element.textContent);
+                    console.log(nomDeLentreprise);
+                    console.log(courDeEntreprise);
                 }
-                else {
+                catch (_a) {
+                    console.log("break");
                     break;
                 }
             }
@@ -45,31 +49,29 @@ async function run() {
     }
     await page.waitForTimeout(2000);
     console.log('lance');
-    // recupListePage();
     for (const lettre of tabLettre) {
         const entrepriseLettre = await page.waitForSelector(`a[href="?letter=${lettre}"]`);
         if (entrepriseLettre) {
             await entrepriseLettre.click();
-            await page.waitForTimeout(2000);
+            await page.waitForNavigation();
             let numPage = 2;
             while (true) {
+                await recupListePage();
                 try {
-                    recupListePage();
                     const pageSuivanteInit = await page.waitForSelector(`a[href="/actions/new-york/${numPage}?letter=${lettre}"]`, { timeout: 500 });
                     if (pageSuivanteInit) {
                         pageSuivanteInit.click();
                         numPage++;
-                        await page.waitForTimeout(2000);
+                        await page.waitForNavigation();
                     }
                 }
                 catch (_a) {
                     try {
-                        recupListePage();
                         const pageSuivante = await page.waitForSelector(`a[href="/actions/new-york/${numPage}"]`, { timeout: 500 });
                         if (pageSuivante) {
                             pageSuivante.click();
                             numPage++;
-                            await page.waitForTimeout(2000);
+                            await page.waitForNavigation();
                         }
                     }
                     catch (_b) {
