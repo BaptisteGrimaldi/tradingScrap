@@ -1,9 +1,5 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const postData_1 = __importDefault(require("./postData"));
 async function recupListePage(page) {
     let listeEntreprisePage = [];
     await page.waitForSelector('table.table.nod.table--values.table--no-auto');
@@ -42,7 +38,7 @@ async function recupListePage(page) {
         }
     }
     //Met sous forme SQL
-    (0, postData_1.default)(listeEntreprisePage);
+    // postData(listeEntreprisePage);
     listeEntreprisePage = [];
 }
 exports.default = recupListePage;

@@ -48,7 +48,7 @@ async function recupListePage(page: any) {
     }
   }
   //Met sous forme SQL
-  postData(listeEntreprisePage);
+  // postData(listeEntreprisePage);
   listeEntreprisePage = [];
 }
 
